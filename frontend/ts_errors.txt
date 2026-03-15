@@ -1,0 +1,29 @@
+src/app/(dashboard)/dashboard/page.tsx(95,17): error TS2607: JSX element class does not support attributes because it does not have a 'props' property.
+src/app/(dashboard)/dashboard/page.tsx(95,18): error TS2786: 'History' cannot be used as a JSX component.
+  Its type '{ new (): History; prototype: History; }' is not a valid JSX element type.
+    Type '{ new (): History; prototype: History; }' is not assignable to type 'new (props: any, context: any) => Component<any, any, any>'.
+      Type 'History' is missing the following properties from type 'Component<any, any, any>': context, setState, forceUpdate, render, props
+src/app/(dashboard)/dashboard/page.tsx(121,36): error TS2322: Type '{ children: Element; variant: "link"; asChild: true; className: string; }' is not assignable to type 'IntrinsicAttributes & ButtonProps & VariantProps<(props?: (ConfigVariants<{ variant: { default: string; outline: string; secondary: string; ghost: string; destructive: string; link: string; }; size: { ...; }; }> & ClassProp) | undefined) => string>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & ButtonProps & VariantProps<(props?: (ConfigVariants<{ variant: { default: string; outline: string; secondary: string; ghost: string; destructive: string; link: string; }; size: { ...; }; }> & ClassProp) | undefined) => string>'.
+src/app/(dashboard)/history/page.tsx(5,24): error TS2307: Cannot find module 'date-fns' or its corresponding type declarations.
+src/app/(dashboard)/layout.tsx(52,29): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/app/(dashboard)/profile/page.tsx(14,17): error TS2339: Property 'clearCredentials' does not exist on type 'AuthState'.
+src/app/(dashboard)/profile/page.tsx(53,15): error TS2367: This comparison appears to be unintentional because the types '"FREE" | "PAID"' and '"PREMIUM"' have no overlap.
+src/app/(dashboard)/settings/page.tsx(5,24): error TS2307: Cannot find module '@/components/ui/switch' or its corresponding type declarations.
+src/app/(dashboard)/settings/page.tsx(42,33): error TS7006: Parameter 'checked' implicitly has an 'any' type.
+src/app/(dashboard)/setup/page.tsx(92,39): error TS2322: Type 'Dispatch<SetStateAction<string>>' is not assignable to type '(value: string | null, eventDetails: SelectRootChangeEventDetails) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'string | null' is not assignable to type 'SetStateAction<string>'.
+      Type 'null' is not assignable to type 'SetStateAction<string>'.
+src/app/(dashboard)/setup/page.tsx(108,36): error TS2322: Type 'Dispatch<SetStateAction<string>>' is not assignable to type '(value: string | null, eventDetails: SelectRootChangeEventDetails) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'string | null' is not assignable to type 'SetStateAction<string>'.
+      Type 'null' is not assignable to type 'SetStateAction<string>'.
+src/app/exam/page.tsx(8,167): error TS2307: Cannot find module '@/components/ui/alert-dialog' or its corresponding type declarations.
+src/components/app-sidebar.tsx(51,21): error TS2322: Type '{ children: Element; asChild: true; isActive: boolean; className: string; }' is not assignable to type 'IntrinsicAttributes & ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & { ...; } & { ...; } & VariantProps<...>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & { ...; } & { ...; } & VariantProps<...>'.
+src/components/app-sidebar.tsx(67,32): error TS2322: Type '{ children: Element[]; delayDuration: number; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'delayDuration' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
+src/components/app-sidebar.tsx(68,41): error TS2322: Type '{ children: Element; asChild: true; }' is not assignable to type 'IntrinsicAttributes & Props<unknown>'.
+  Property 'asChild' does not exist on type 'IntrinsicAttributes & Props<unknown>'.
