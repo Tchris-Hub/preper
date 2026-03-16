@@ -3,16 +3,28 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Bell, Shield, Moon, Monitor } from "lucide-react";
+import { Bell, Shield, Moon, Monitor, CreditCard } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import api from "@/lib/axios";
+import { useAuthStore } from "@/store/useAuthStore";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { user } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const [plans, setPlans] = useState<any[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     setMounted(true);
+    // Fetch plans
+    api.get('/subscriptions/plans/')
+      .then((res) => setPlans(res.data))
+      .catch((err) => console.error("Could not load plans", err));
   }, []);
 
   if (!mounted) return null;
@@ -84,6 +96,51 @@ export default function SettingsPage() {
               <p className="text-sm text-neutral-500">Add an extra layer of security to your account.</p>
             </div>
             <Switch disabled />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-black/40 border-white/10 backdrop-blur-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5 text-blue-400" /> Subscription Plan
+          </CardTitle>
+          <CardDescription>Manage your premium access and billing.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-base text-white">Current Tier: {user?.subscription_tier === 'PAID' ? 'Premium (Unlimited)' : 'Free (5 Exams/Day)'}</Label>
+              <p className="text-sm text-neutral-500">
+                {user?.subscription_tier === 'PAID' ? 'You have unlocked all features, including AI Explanations.' : 'Upgrade to Premium for unlimited mock exams and voice explanations.'}
+              </p>
+            </div>
+            {user && user.subscription_tier !== 'PAID' && (
+              <Button 
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    const planId = plans.length > 0 ? plans[0].id : 1;
+                    const res = await api.post('/subscriptions/paystack/initialize/', { plan_id: planId });
+                    if (res.data?.data?.authorization_url) {
+                      window.location.href = res.data.data.authorization_url;
+                    } else if (res.data?.authorization_url) {
+                      window.location.href = res.data.authorization_url;
+                    } else {
+                      throw new Error('No auth url returned');
+                    }
+                  } catch (err: any) {
+                    toast({ title: "Checkout Error", description: err.response?.data?.error || "Could not start checkout", variant: "destructive" });
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {loading ? "Loading..." : "Upgrade Now (₦2,000)"}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

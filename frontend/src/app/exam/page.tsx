@@ -10,13 +10,16 @@ import { Loader2, ArrowLeft, ArrowRight, CheckCircle2, AlertCircle } from "lucid
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { ExplanationVoice } from "@/components/ExplanationVoice";
 
 export default function ExamPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [reviewScore, setReviewScore] = useState(0);
+
   const { 
     questions, currentQuestionIndex, answers, timeRemaining, 
     examType, subject, year, isDraft, tick, setAnswer, 
@@ -74,8 +77,10 @@ export default function ExamPage() {
       });
 
       toast.success("Exam submitted successfully!");
-      clearQuiz();
-      router.push("/history");
+      setReviewScore(score);
+      setShowConfirm(false);
+      setIsSubmitted(true);
+      // do not clearQuiz or route away so they can review
       
     } catch (error) {
       toast.error("Failed to submit exam.");
@@ -101,9 +106,80 @@ export default function ExamPage() {
   };
 
   const currentQ = questions[currentQuestionIndex];
-  if (!currentQ) return null;
+  if (!currentQ && !isSubmitted) return null;
 
   const answeredCount = Object.keys(answers).length;
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans p-4 lg:p-8 overflow-y-auto w-full">
+        <div className="max-w-4xl mx-auto space-y-8 w-full">
+          <Card className="bg-black/40 border-white/10 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
+            <div className="h-2 w-full bg-gradient-to-r from-emerald-500 to-indigo-500" />
+            <CardContent className="p-8 text-center space-y-4">
+              <CheckCircle2 className="h-16 w-16 text-emerald-500 mx-auto" />
+              <h1 className="text-3xl font-bold">Exam Completed</h1>
+              <p className="text-neutral-400 text-lg">You scored <span className="text-emerald-400 font-bold">{reviewScore}</span> out of {questions.length}</p>
+              <Button onClick={() => { clearQuiz(); router.push("/history"); }} className="mt-4 bg-indigo-600">Back to Dashboard</Button>
+            </CardContent>
+          </Card>
+
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Review Your Answers</h2>
+            {questions.map((q, i) => {
+              const userAnswer = answers[i] || null;
+              const isCorrect = userAnswer === q.answer;
+              return (
+                <Card key={i} className={`bg-black/40 border-white/10 backdrop-blur-md overflow-hidden ${isCorrect ? 'border-emerald-500/50' : 'border-red-500/50'}`}>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex gap-4">
+                      <span className="text-2xl font-bold text-neutral-500">{i + 1}.</span>
+                      <div className="space-y-2 w-full">
+                        <p className="text-lg leading-relaxed text-neutral-200" dangerouslySetInnerHTML={{ __html: q.question }} />
+                        
+                        <div className="mt-4 grid gap-2">
+                          {['a', 'b', 'c', 'd'].map(key => {
+                            const opt = q.option[key as keyof typeof q.option];
+                            if (!opt) return null;
+                            const isUserChoice = userAnswer === key;
+                            const isActualAnswer = q.answer === key;
+                            let bg = "bg-neutral-900 border-white/5";
+                            if (isActualAnswer) bg = "bg-emerald-500/20 border-emerald-500 text-emerald-200";
+                            else if (isUserChoice && !isCorrect) bg = "bg-red-500/20 border-red-500 text-red-200";
+
+                            return (
+                              <div key={key} className={`p-3 rounded border ${bg} flex items-center gap-3`}>
+                                <span className="uppercase font-bold text-neutral-500">{key}</span>
+                                <span dangerouslySetInnerHTML={{ __html: opt }} />
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        {q.solution && (
+                          <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
+                            <h4 className="font-bold text-indigo-400 mb-2">Explanation</h4>
+                            <p className="text-neutral-300 mb-3" dangerouslySetInnerHTML={{ __html: q.solution }} />
+                            <ExplanationVoice text={q.solution.replace(/<[^>]+>/g, '')} />
+                          </div>
+                        )}
+                        {!q.solution && (
+                          <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center">
+                            <h4 className="font-bold text-indigo-400 mb-0 mr-4">AI Explanation</h4>
+                            <ExplanationVoice text={`The correct answer is ${q.answer?.toUpperCase()}. Please review the topic to understand why.`} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans">

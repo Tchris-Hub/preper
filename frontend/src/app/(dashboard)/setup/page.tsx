@@ -43,7 +43,7 @@ export default function ExamSetupPage() {
     } catch (err: any) {
       if (err.response?.status === 403) {
         toast.error("Daily limit reached! Please upgrade to continue practicing.");
-        router.push("/pricing");
+        router.push("/settings");
       } else {
         toast.error("Failed to fetch questions. " + (err.response?.data?.error || ""));
       }

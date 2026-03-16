@@ -140,3 +140,43 @@ class ExamAnalyticsView(APIView):
             "subject_stats": list(subject_stats),
             "total_attempts": attempts.count()
         })
+
+class TTSProxyView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        
+        # Gate: Check subscription tier
+        if user.subscription_tier != 'PAID':
+            return Response({"error": "Premium feature. Please upgrade to use voice explanations."}, status=status.HTTP_403_FORBIDDEN)
+            
+        text = request.data.get('text')
+        if not text:
+            return Response({"error": "Text is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Optional: truncate text to save characters if necessary
+        text = text[:500] 
+        
+        elevenlabs_key = getattr(settings, 'ELEVENLABS_KEY', '')
+        if not elevenlabs_key:
+            return Response({"error": "TTS temporarily unavailable"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            
+        headers = {"xi-api-key": elevenlabs_key}
+        voice_id = "21m00Tcm4TlvDq8ikWAM" # default Rachel voice or whatever is in ElevenLabs
+        
+        try:
+            resp = requests.post(
+                f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream",
+                json={"text": text, "model_id": "eleven_multilingual_v2"},
+                headers=headers,
+                stream=True
+            )
+            
+            if resp.status_code == 200:
+                from django.http import HttpResponse
+                return HttpResponse(resp.content, content_type='audio/mpeg')
+            else:
+                return Response({"error": "TTS service error", "details": resp.text}, status=status.HTTP_502_BAD_GATEWAY)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
