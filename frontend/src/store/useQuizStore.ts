@@ -25,8 +25,9 @@ interface QuizState {
   subject: string;
   year: string;
   isDraft: boolean;
+  mode: string;
   
-  startQuiz: (examType: string, subject: string, year: string, questions: Question[], totalTime: number) => void;
+  startQuiz: (examType: string, subject: string, year: string, questions: Question[], totalTime: number, mode?: string) => void;
   setAnswer: (index: number, answer: string) => void;
   nextQuestion: () => void;
   prevQuestion: () => void;
@@ -46,13 +47,15 @@ export const useQuizStore = create<QuizState>()(
       subject: '',
       year: '',
       isDraft: false,
+      mode: 'normal',
       
-      startQuiz: (examType, subject, year, questions, totalTime) => set({
+      startQuiz: (examType, subject, year, questions, totalTime, mode = 'normal') => set({
         examType, subject, year, questions,
         timeRemaining: totalTime,
         currentQuestionIndex: 0,
         answers: {},
-        isDraft: true
+        isDraft: true,
+        mode
       }),
       
       setAnswer: (index, answer) => set((state) => ({
@@ -81,7 +84,8 @@ export const useQuizStore = create<QuizState>()(
         examType: '',
         subject: '',
         year: '',
-        isDraft: false
+        isDraft: false,
+        mode: 'normal'
       })
     }),
     { name: 'quiz-storage' }

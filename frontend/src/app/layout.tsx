@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   description: 'JAMB, WAEC, NECO CBT prep platform',
 };
 
+import { VoiceTutor } from '@/components/VoiceTutor';
+import { MotivationalGrace } from '@/components/MotivationalGrace';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +31,8 @@ export default function RootLayout({
         >
           <TooltipProvider>
             {children}
+            <VoiceTutor />
+            <MotivationalGrace />
             <Toaster position="top-center" richColors theme="system" />
           </TooltipProvider>
         </ThemeProvider>

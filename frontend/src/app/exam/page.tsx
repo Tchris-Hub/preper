@@ -11,6 +11,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExplanationVoice } from "@/components/ExplanationVoice";
+import { QuestionVoice } from "@/components/QuestionVoice";
 
 export default function ExamPage() {
   const router = useRouter();
@@ -56,13 +57,15 @@ export default function ExamPage() {
       const details: Record<string, any> = {};
       
       questions.forEach((q, i) => {
-        const userAnswer = answers[i] || null;
-        const isCorrect = userAnswer === q.answer;
+        const userAnswer = (answers[i] || "").toLowerCase();
+        const correctAnswer = (q.answer || "").toLowerCase();
+        const isCorrect = userAnswer === correctAnswer;
+        
         if (isCorrect) score++;
         
         details[q.id] = {
           userAnswer,
-          correctAnswer: q.answer,
+          correctAnswer,
           isCorrect
         };
       });
@@ -160,13 +163,13 @@ export default function ExamPage() {
                           <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg">
                             <h4 className="font-bold text-indigo-400 mb-2">Explanation</h4>
                             <p className="text-neutral-300 mb-3" dangerouslySetInnerHTML={{ __html: q.solution }} />
-                            <ExplanationVoice text={q.solution.replace(/<[^>]+>/g, '')} />
+                            <ExplanationVoice question={q} />
                           </div>
                         )}
                         {!q.solution && (
-                          <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center">
-                            <h4 className="font-bold text-indigo-400 mb-0 mr-4">AI Explanation</h4>
-                            <ExplanationVoice text={`The correct answer is ${q.answer?.toUpperCase()}. Please review the topic to understand why.`} />
+                          <div className="mt-6 p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex flex-col gap-4">
+                            <h4 className="font-bold text-indigo-400 mb-0">AI Tutor Coach</h4>
+                            <ExplanationVoice question={q} />
                           </div>
                         )}
                       </div>
@@ -185,13 +188,20 @@ export default function ExamPage() {
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans">
       {/* Top Bar */}
       <header className="h-16 border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-4 lg:px-8">
-        <div className="flex flex-col">
-          <span className="font-bold uppercase tracking-wider text-indigo-400 text-sm">
-            {examType} • {subject} • {year === "random" ? "Random Year" : year}
-          </span>
-          <span className="text-xs text-neutral-400">
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-bold uppercase tracking-wider text-indigo-400 text-sm">
+                {examType} • {subject}
+              </span>
+              <div className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[8px] font-black text-indigo-300 uppercase tracking-widest">
+                {useQuizStore.getState().mode.replace('_', ' ')}
+              </div>
+            </div>
+            <span className="text-xs text-neutral-400">
+              Question {currentQuestionIndex + 1} of {questions.length} • {year === "random" ? "Random Year" : year} Edition
+            </span>
+          </div>
         </div>
         
         <div className="flex items-center gap-6">
@@ -234,12 +244,17 @@ export default function ExamPage() {
                       {(currentQuestionIndex + 1).toString().padStart(2, '0')}
                     </span>
                     <div className="space-y-4">
-                      {currentQ.section && (
-                        <p className="text-sm font-medium text-emerald-400 uppercase tracking-widest leading-relaxed bg-emerald-500/10 inline-block px-3 py-1 rounded-md mb-2">
-                          {currentQ.section.replace(/<[^>]+>/g, '')}
-                        </p>
-                      )}
-                      {/* Note: In a real app, dangerous HTML should be sanitized with DOMPurify. ALOC returns HTML. */}
+                      <div className="flex items-center justify-between mb-2">
+                        {currentQ.section && (
+                          <p className="text-sm font-medium text-emerald-400 uppercase tracking-widest leading-relaxed bg-emerald-500/10 inline-block px-3 py-1 rounded-md">
+                            {currentQ.section.replace(/<[^>]+>/g, '')}
+                          </p>
+                        )}
+                        <QuestionVoice 
+                          question={currentQ.question} 
+                          options={currentQ.option} 
+                        />
+                      </div>
                       <h2 
                         className="text-xl md:text-2xl leading-relaxed text-neutral-100" 
                         dangerouslySetInnerHTML={{ __html: currentQ.question }} 
