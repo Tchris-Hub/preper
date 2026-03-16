@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -17,7 +17,6 @@ export default function SettingsPage() {
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [plans, setPlans] = useState<any[]>([]);
-  const { toast } = useToast();
 
   useEffect(() => {
     setMounted(true);
@@ -130,7 +129,7 @@ export default function SettingsPage() {
                       throw new Error('No auth url returned');
                     }
                   } catch (err: any) {
-                    toast({ title: "Checkout Error", description: err.response?.data?.error || "Could not start checkout", variant: "destructive" });
+                    toast.error("Checkout Error", { description: err.response?.data?.error || "Could not start checkout" });
                   } finally {
                     setLoading(false);
                   }
