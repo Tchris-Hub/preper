@@ -141,6 +141,25 @@ class ExamAnalyticsView(APIView):
             "total_attempts": attempts.count()
         })
 
+class ExamAttemptDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            attempt = ExamAttempt.objects.get(id=pk, user=request.user)
+            return Response({
+                "id": attempt.id,
+                "exam_type": attempt.exam_type,
+                "subject": attempt.subject,
+                "year": attempt.year,
+                "score": attempt.score,
+                "total_questions": attempt.total_questions,
+                "date_attempted": attempt.date_attempted,
+                "details": attempt.details,
+            })
+        except ExamAttempt.DoesNotExist:
+            return Response({"error": "Attempt not found"}, status=status.HTTP_404_NOT_FOUND)
+
 class TTSProxyView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
