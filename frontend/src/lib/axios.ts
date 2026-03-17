@@ -1,13 +1,16 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
-// We assume backend runs on localhost:8000 for development
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const isSupabase = process.env.NEXT_PUBLIC_BACKEND_MODE === 'supabase';
+const rawUrl = isSupabase ? '/api' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api');
+
+export const API_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Bypass-Tunnel-Reminder': 'true',
   },
 });
 

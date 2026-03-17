@@ -64,6 +64,12 @@ export default function ExamPage() {
         if (isCorrect) score++;
         
         details[q.id] = {
+          question: q.question,
+          option: q.option,
+          section: q.section,
+          image: q.image,
+          answer: q.answer,
+          solution: q.solution,
           userAnswer,
           correctAnswer,
           isCorrect
@@ -187,42 +193,47 @@ export default function ExamPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans">
       {/* Top Bar */}
-      <header className="h-16 border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-4 lg:px-8">
-        <div className="flex items-center gap-4">
+      <header className="min-h-16 h-auto md:h-16 border-b border-white/10 bg-black/40 backdrop-blur-md sticky top-0 z-10 flex flex-col md:flex-row items-center justify-between px-4 lg:px-8 py-3 md:py-0 gap-4 md:gap-0">
+        <div className="flex items-center gap-4 w-full md:w-auto overflow-hidden">
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="font-bold uppercase tracking-wider text-indigo-400 text-sm">
-                {examType} • {subject}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold uppercase tracking-wider text-indigo-400 text-xs md:text-sm whitespace-nowrap">
+                {examType} • {Array.isArray(subject) ? `${subject.length} Subjects` : subject}
               </span>
               <div className="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[8px] font-black text-indigo-300 uppercase tracking-widest">
                 {useQuizStore.getState().mode.replace('_', ' ')}
               </div>
             </div>
-            <span className="text-xs text-neutral-400">
+            <span className="text-[10px] md:text-xs text-neutral-400">
               Question {currentQuestionIndex + 1} of {questions.length} • {year === "random" ? "Random Year" : year} Edition
             </span>
+            {currentQ?.subject && (
+               <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-tighter mt-1">
+                 Current: {currentQ.subject}
+               </span>
+            )}
           </div>
         </div>
         
-        <div className="flex items-center gap-6">
-          <div className="text-center">
-            <div className={`text-2xl font-mono font-bold tracking-wider ${timeRemaining < 300 ? 'text-red-500 animate-pulse' : 'text-emerald-400'}`}>
+        <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto">
+          <div className="text-center md:text-right">
+            <div className={`text-xl md:text-2xl font-mono font-bold tracking-wider ${timeRemaining < 300 ? 'text-red-500 animate-pulse' : 'text-emerald-400'}`}>
               {formatTime(timeRemaining)}
             </div>
-            <div className="text-[10px] uppercase tracking-widest text-neutral-500 font-semibold">Time Remaining</div>
+            <div className="text-[8px] md:text-[10px] uppercase tracking-widest text-neutral-500 font-semibold">Time Remaining</div>
           </div>
           <Button 
             onClick={() => setShowConfirm(true)} 
             variant="destructive" 
-            className="hidden md:flex rounded-xl font-semibold shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] transition-all"
+            className="flex rounded-xl md:rounded-xl font-semibold shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] transition-all h-10 px-4 md:h-10 text-xs md:text-sm"
           >
-            Submit Exam
+            Submit
           </Button>
         </div>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full gap-6 p-4 lg:p-8">
+      <main className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full gap-6 p-4 lg:p-8 overflow-hidden">
         
         {/* Question Area */}
         <div className="flex-1 space-y-6">
@@ -331,8 +342,8 @@ export default function ExamPage() {
         </div>
 
         {/* Navigation Panel */}
-        <div className="w-full md:w-80 space-y-6 shrink-0 order-first md:order-last">
-          <Card className="bg-black/40 border-white/10 backdrop-blur-md rounded-2xl h-full flex flex-col max-h-[140px] md:max-h-none">
+        <div className="w-full md:w-80 space-y-6 shrink-0 order-last">
+          <Card className="bg-black/40 border-white/10 backdrop-blur-md rounded-2xl h-full flex flex-col min-h-[220px] md:min-h-none">
             <CardContent className="p-4 flex flex-col h-full space-y-4">
               <div className="flex justify-between items-center px-1">
                 <span className="text-sm font-medium text-neutral-400">Question Map</span>

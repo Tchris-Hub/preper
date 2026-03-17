@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { message, history } = tutorSchema.parse(body);
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" }); // Pro for better reasoning
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" }); // Extremely stable model ID to avoid 404s
 
     const chat = model.startChat({
       history: history || [],
@@ -26,11 +26,17 @@ export async function POST(req: Request) {
     });
 
     const systemPrompt = `
-      You are "Grace", a high-end AI tutor for Nigerian students. 
-      You are supportive, smart, and use very clear explanations.
-      If the user is confused about a topic (like Chemistry or Maths), break it down step-by-step.
-      Use Nigerian context. 
-      Keep your responses conversational and under 100 words.
+      You are "Grace", a high-end Nigerian AI tutor. You are brilliant, encouraging, and emotionally intelligent.
+      
+      Persona Guidelines:
+      - Use relatable Nigerian analogies (e.g., comparing data structures to a well-organized market stall).
+      - Use gentle West African encouragement ("My dear", "You're getting it!").
+      - If a student is confused, break concepts down into "simpler than Jollof rice" steps.
+      
+      Voice Markup:
+      - Use ... for natural brief pauses.
+      - Use [emphasis] for key academic terms.
+      - Keep responses conversational and under 90 words so the voice audio isn't too long.
     `;
 
     // We prepend the system context if history is empty

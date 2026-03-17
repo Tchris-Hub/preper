@@ -2,14 +2,15 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
-import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { Menu, Loader2, Sparkles, CalendarRange, Headphones, LayoutDashboard, BookOpen, History, UserCircle, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 
 const mainNav = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
@@ -29,19 +30,40 @@ const bottomNav = [
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-    if (!user) {
-      router.push('/login');
-    }
-  }, [user, router]);
+    const supabase = createClient();
 
-  if (!mounted || !user) {
+    // Get the current user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      setUser(user);
+      setLoading(false);
+    });
+
+    // Listen for auth changes (logout, token refresh, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_OUT") {
+          router.push("/login");
+        }
+        if (session?.user) {
+          setUser(session.user);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
         <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
@@ -107,8 +129,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="ml-4 font-bold text-lg tracking-tight">Ace Exams</div>
           </header>
 
-          <main className="flex-1 overflow-y-auto p-4 md:p-8">
-            <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full max-w-full">
+            <div className="max-w-6xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
               {children}
             </div>
           </main>

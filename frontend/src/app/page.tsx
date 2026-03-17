@@ -87,23 +87,32 @@ export default function LandingPage() {
 
       {/* Feature Grid */}
       <section id="features" className="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-         <div className="grid md:grid-cols-3 gap-8">
+         <motion.div 
+           initial="hidden" 
+           whileInView="visible" 
+           viewport={{ once: true, margin: "-100px" }}
+           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.15 } } }}
+           className="grid md:grid-cols-3 gap-8"
+         >
             <FeatureCard 
               icon={<Mic className="h-6 w-6 text-indigo-400" />}
               title="AI Voice Coaching"
               description="Hear spoken explanations for every wrong answer. Our vocal coach sounds human, patient, and encouraging."
+              delay={0}
             />
             <FeatureCard 
               icon={<Globe className="h-6 w-6 text-purple-400" />}
               title="Multilingual Support"
               description="Learn in Igbo, Yoruba, Hausa or Pidgin. Conceptual understanding is deeper in your native tongue."
+              delay={1}
             />
             <FeatureCard 
               icon={<Shield className="h-6 w-6 text-emerald-400" />}
               title="Exam Accuracy"
               description="100% Verified JAMB/WAEC past questions with intelligent grading that actually counts every point."
+              delay={2}
             />
-         </div>
+         </motion.div>
       </section>
 
       {/* Show the Soul */}
@@ -148,27 +157,45 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <footer className="py-32 px-6 text-center">
-         <h3 className="text-3xl md:text-5xl font-black mb-8">Ready to ace your exams?</h3>
-         <Link href="/login">
-            <Button className="h-16 px-12 rounded-2xl bg-white text-black hover:bg-neutral-200 text-lg font-bold">
-               Join 5,000+ Nigerian Students
-            </Button>
-         </Link>
-         <p className="mt-8 text-neutral-500 text-sm">Join the evolution of education. Ace Your Exams 2026.</p>
+      <footer className="py-32 px-6 text-center relative">
+         <div className="absolute inset-0 overflow-hidden pointer-events-none">
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-indigo-600/10 blur-[150px] rounded-full" />
+         </div>
+         <motion.div
+           initial={{ opacity: 0, y: 30 }}
+           whileInView={{ opacity: 1, y: 0 }}
+           viewport={{ once: true }}
+           className="relative z-10"
+         >
+           <h3 className="text-3xl md:text-5xl font-black mb-8 text-gradient">Ready to ace your exams?</h3>
+           <Link href="/login">
+              <Button className="h-16 px-12 rounded-2xl bg-white text-black hover:bg-neutral-200 text-lg font-bold glow-indigo hover:scale-105 transition-transform">
+                 Join 5,000+ Nigerian Students
+              </Button>
+           </Link>
+           <p className="mt-8 text-neutral-500 text-sm">Join the evolution of education. Ace Your Exams 2026.</p>
+         </motion.div>
       </footer>
     </div>
   );
 }
 
-function FeatureCard({ icon, title, description }: any) {
+function FeatureCard({ icon, title, description, delay = 0 }: any) {
   return (
-    <div className="p-8 rounded-[2rem] bg-white/5 border border-white/5 hover:border-indigo-500/20 transition-all group">
-       <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          {icon}
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 30 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+      }}
+      className="glass-card glass-card-hover p-8 rounded-[2rem] group relative overflow-hidden noise-overlay"
+    >
+       <div className="relative z-10">
+         <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+            {icon}
+         </div>
+         <h4 className="text-xl font-bold mb-3 group-hover:text-indigo-300 transition-colors">{title}</h4>
+         <p className="text-neutral-400 text-sm leading-relaxed">{description}</p>
        </div>
-       <h4 className="text-xl font-bold mb-3">{title}</h4>
-       <p className="text-neutral-400 text-sm leading-relaxed">{description}</p>
-    </div>
+    </motion.div>
   );
 }

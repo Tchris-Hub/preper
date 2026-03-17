@@ -85,7 +85,7 @@ export function VoiceTutor() {
             initial={{ opacity: 0, y: 100, scale: 0.9, x: 50 }}
             animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
             exit={{ opacity: 0, y: 100, scale: 0.9, x: 50 }}
-            className="fixed bottom-28 right-8 w-[400px] h-[600px] bg-neutral-900 border border-white/10 rounded-3xl shadow-2xl flex flex-col z-50 overflow-hidden backdrop-blur-xl"
+            className="fixed bottom-28 right-4 md:right-8 w-[calc(100vw-2rem)] md:w-[400px] h-[500px] md:h-[600px] bg-neutral-900 border border-white/10 rounded-3xl shadow-2xl flex flex-col z-50 overflow-hidden backdrop-blur-xl"
           >
             <div className="p-6 border-b border-white/5 bg-white/5 flex items-center gap-4">
                <div className="h-12 w-12 rounded-full bg-indigo-500 overflow-hidden relative">

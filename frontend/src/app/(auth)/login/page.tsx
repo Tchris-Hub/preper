@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuthStore } from "@/store/useAuthStore";
-import api from "@/lib/axios";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,31 +11,48 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
+  const [identifier, setIdentifier] = useState(""); // Email or Username
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const setCredentials = useAuthStore((state) => state.setCredentials);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      const res = await api.post("/auth/login/", { username, password });
-      const { access, refresh } = res.data;
+
+    const supabase = createClient();
+    let loginEmail = identifier;
+
+    // If identifier doesn't look like an email, try to resolve it as a username
+    if (!identifier.includes("@")) {
+      const { data, error: profileError } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("username", identifier)
+        .single();
       
-      const profileRes = await api.get("/users/profile/", {
-        headers: { Authorization: `Bearer ${access}` }
-      });
-      
-      setCredentials(profileRes.data, access, refresh);
-      toast.success("Welcome back!");
-      router.push("/dashboard");
-    } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Failed to login. Please check your credentials.");
-    } finally {
-      setLoading(false);
+      if (profileError || !data?.email) {
+        toast.error("Account not found with that username.");
+        setLoading(false);
+        return;
+      }
+      loginEmail = data.email;
     }
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Welcome back!");
+    router.push("/dashboard");
+    router.refresh();
   };
 
   return (
@@ -48,13 +64,14 @@ export default function LoginPage() {
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="username" className="text-neutral-300">Username</Label>
+          <Label htmlFor="identifier" className="text-neutral-300">Email or Username</Label>
           <Input 
-            id="username" 
-            placeholder="johndoe" 
+            id="identifier" 
+            type="text"
+            placeholder="Enter your email or username" 
             required 
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             className="bg-black/20 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-indigo-500"
           />
         </div>
@@ -77,7 +94,7 @@ export default function LoginPage() {
         
         <Button 
           type="submit" 
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-all rounded-xl mt-2"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-all rounded-xl mt-2 h-12 text-base font-bold hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] active:scale-[0.98]"
           disabled={loading}
         >
           {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign In"}

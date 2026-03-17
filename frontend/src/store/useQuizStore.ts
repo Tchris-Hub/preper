@@ -14,6 +14,7 @@ interface Question {
   image: string;
   answer: string;
   solution: string;
+  subject?: string;
 }
 
 interface QuizState {
@@ -22,12 +23,12 @@ interface QuizState {
   answers: Record<number, string>; // question index -> answer key ('a', 'b', etc)
   timeRemaining: number; // in seconds
   examType: string;
-  subject: string;
+  subject: string | string[];
   year: string;
   isDraft: boolean;
   mode: string;
   
-  startQuiz: (examType: string, subject: string, year: string, questions: Question[], totalTime: number, mode?: string) => void;
+  startQuiz: (examType: string, subject: string | string[], year: string, questions: Question[], totalTime: number, mode?: string) => void;
   setAnswer: (index: number, answer: string) => void;
   nextQuestion: () => void;
   prevQuestion: () => void;

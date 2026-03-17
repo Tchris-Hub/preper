@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import api from "@/lib/axios";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,16 +28,33 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await api.post("/auth/register/", formData);
-      toast.success("Account created successfully. Please sign in.");
-      router.push("/login");
-    } catch (error: any) {
-      const errMessage = error.response?.data ? Object.values(error.response.data)[0] : "Registration failed";
-      toast.error(errMessage as string);
-    } finally {
+
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
       setLoading(false);
+      return;
     }
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        data: {
+          username: formData.username,
+          full_name: `${formData.first_name} ${formData.last_name}`.trim(),
+        },
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Account created! Check your email to confirm, or sign in directly.");
+    router.push("/login");
   };
 
   return (
@@ -74,7 +91,7 @@ export default function RegisterPage() {
           <Input id="password" type="password" required value={formData.password} onChange={handleChange} className="bg-black/20 border-white/10 text-white focus-visible:ring-indigo-500" />
         </div>
         
-        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-all rounded-xl mt-2" disabled={loading}>
+        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white transition-all rounded-xl mt-2 h-12 text-base font-bold hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)] active:scale-[0.98]" disabled={loading}>
           {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Sign Up"}
         </Button>
       </form>
