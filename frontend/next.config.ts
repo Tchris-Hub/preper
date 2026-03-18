@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: 'standalone',
   reactStrictMode: true,
+  // Allow cross-origin access from WSL and local network devices during dev
+  allowedDevOrigins: ['172.18.96.1', '192.168.100.30', 'localhost'],
   async headers() {
     return [
       {
