@@ -144,11 +144,11 @@ export default function ExamSetupPage() {
     <div className="space-y-10 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
-          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 italic uppercase">
-             <Layers className="h-8 w-8 text-indigo-500" />
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight flex items-center gap-3 italic uppercase">
+             <Layers className="h-7 w-7 md:h-8 md:w-8 text-indigo-500" />
              Choose Your Arena
           </h1>
-          <p className="text-neutral-500 max-w-xl font-medium">
+          <p className="text-sm md:text-base text-neutral-500 max-w-xl font-medium">
              Select a learning mode designed to maximize your exam performance. 
              <span className="text-indigo-400"> Enterprise-grade logic active.</span>
           </p>
@@ -182,8 +182,8 @@ export default function ExamSetupPage() {
               </div>
             )}
             
-            <Card className="bg-transparent border-0 h-full relative z-10 p-2">
-              <CardContent className="p-8 flex flex-col h-full gap-4">
+            <Card className="bg-transparent border-0 h-full relative z-10 p-0 md:p-2">
+              <CardContent className="p-6 md:p-8 flex flex-col h-full gap-4">
                  <div className="flex justify-between items-start">
                     <div className="h-14 w-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform relative overflow-hidden">
                        <div className="relative z-10">{mode.icon}</div>
@@ -233,9 +233,9 @@ export default function ExamSetupPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 30 }}
-              className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[100] w-full max-w-6xl px-6"
+              className="fixed bottom-0 md:bottom-12 left-0 md:left-1/2 md:-translate-x-1/2 z-[100] w-full max-w-6xl px-0 md:px-6"
             >
-              <div className="bg-neutral-900/90 backdrop-blur-3xl border border-indigo-500/30 p-8 rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.8)]" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-neutral-900/95 md:bg-neutral-900/90 backdrop-blur-3xl border-t md:border border-indigo-500/30 p-6 md:p-8 rounded-t-[2.5rem] md:rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.8)]" onClick={(e) => e.stopPropagation()}>
                
                <div className="flex flex-col lg:flex-row gap-8 items-end">
                   
@@ -278,11 +278,11 @@ export default function ExamSetupPage() {
                   </div>
 
                   {/* Year & Action */}
-                  <div className="flex flex-col md:flex-row gap-6 w-full lg:w-auto items-end">
+                  <div className="flex flex-col md:flex-row gap-4 md:gap-6 w-full lg:w-auto items-stretch md:items-end">
                      <div className="space-y-1.5 w-full md:w-32">
                         <Label className="text-[10px] uppercase tracking-widest font-black text-neutral-500 px-1">Mock Year</Label>
                         <Select value={year} onValueChange={(val) => val && setYear(val)}>
-                           <SelectTrigger className="bg-white/5 border-white/5 h-14 text-white rounded-2xl focus:ring-indigo-500">
+                           <SelectTrigger className="bg-white/5 border-white/5 h-12 md:h-14 text-white rounded-xl md:rounded-2xl focus:ring-indigo-500">
                               <SelectValue placeholder="Year" />
                            </SelectTrigger>
                            <SelectContent className="bg-neutral-900 border-white/10 text-white rounded-2xl">
@@ -293,15 +293,15 @@ export default function ExamSetupPage() {
                            </SelectContent>
                         </Select>
                      </div>
-
+ 
                      <Button 
                         onClick={handleStart} 
                         disabled={loading}
-                        className="h-16 px-12 rounded-[1.5rem] bg-indigo-600 hover:bg-indigo-700 text-lg font-black group shadow-[0_20px_40px_rgba(79,70,229,0.3)] min-w-[240px] transition-all hover:scale-105 active:scale-95"
+                        className="h-14 md:h-16 px-12 rounded-xl md:rounded-[1.5rem] bg-indigo-600 hover:bg-indigo-700 text-lg font-black group shadow-[0_20px_40px_rgba(79,70,229,0.3)] min-w-[240px] transition-all hover:scale-105 active:scale-95"
                      >
                         {loading ? <Loader2 className="animate-spin h-6 w-6" /> : (
-                           <span className="flex items-center gap-2 italic uppercase">
-                              START SESSION <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                           <span className="flex items-center justify-center gap-2 italic uppercase">
+                               START SESSION <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                            </span>
                         )}
                      </Button>

@@ -16,8 +16,17 @@ import { createBrowserClient } from "@supabase/ssr";
  * For sensitive operations (grading, payments), use Server Actions instead.
  */
 export function createClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error(
+      "MISSING SUPABASE ENV VARS: Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your .env file or Vercel dashboard."
+    );
+  }
+
   return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    supabaseUrl || "",
+    supabaseAnonKey || ""
   );
 }

@@ -53,8 +53,11 @@ export default function RegisterPage() {
       return;
     }
 
-    toast.success("Account created! Check your email to confirm, or sign in directly.");
-    router.push("/login");
+    toast.success("Account created! Check your email to confirm.", {
+      description: "If you don't see it, please check your junk/spam folder.",
+      duration: 6000,
+    });
+    router.push("/login?registered=true");
   };
 
   return (
@@ -65,7 +68,7 @@ export default function RegisterPage() {
       </div>
 
       <form onSubmit={handleRegister} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="first_name" className="text-neutral-300">First Name</Label>
             <Input id="first_name" required value={formData.first_name} onChange={handleChange} className="bg-black/20 border-white/10 text-white focus-visible:ring-indigo-500" />

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,22 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isRegistered = searchParams.get("registered") === "true";
+
+  useEffect(() => {
+    if (isRegistered) {
+      toast.info("Please verify your email", {
+        description: "Check your inbox and junk/spam folder for the confirmation link.",
+        duration: 8000,
+      });
+    }
+  }, [isRegistered]);
+
   const [identifier, setIdentifier] = useState(""); // Email or Username
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

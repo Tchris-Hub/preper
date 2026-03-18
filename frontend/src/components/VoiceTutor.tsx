@@ -74,9 +74,9 @@ export function VoiceTutor() {
       <motion.button
         animate={isOpen ? { scale: 0.9, rotate: -90 } : { scale: 1, rotate: 0 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 right-8 h-16 w-16 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-2xl flex items-center justify-center text-white z-50 border-2 border-white/20"
+        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 h-14 w-14 md:h-16 md:w-16 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-2xl flex items-center justify-center text-white z-50 border-2 border-white/20"
       >
-        {isOpen ? <X className="h-8 w-8" /> : <Sparkles className="h-8 w-8" />}
+        {isOpen ? <X className="h-6 w-6 md:h-8 md:w-8" /> : <Sparkles className="h-6 w-6 md:h-8 md:w-8" />}
       </motion.button>
 
       <AnimatePresence>

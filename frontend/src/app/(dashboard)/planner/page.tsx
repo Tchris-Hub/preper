@@ -108,11 +108,11 @@ export default function PlannerPage() {
     <div className="space-y-10 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
-          <h1 className="text-4xl font-black tracking-tight text-white flex items-center gap-3">
-             <CalendarRange className="h-8 w-8 text-indigo-400" />
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white flex items-center gap-3">
+             <CalendarRange className="h-7 w-7 md:h-8 md:w-8 text-indigo-400" />
              AI STUDY PLANNER
           </h1>
-          <p className="text-neutral-500">Your path to exam dominance, recalculated by Grace based on your weak points.</p>
+          <p className="text-sm md:text-base text-neutral-500">Your path to exam dominance, recalculated by Grace based on your weak points.</p>
         </div>
         {!showSetup && (
           <Button 
@@ -134,7 +134,7 @@ export default function PlannerPage() {
             exit={{ opacity: 0, y: -20 }}
             key="setup"
           >
-            <Card className="glass-card max-w-2xl mx-auto rounded-[2.5rem] p-10 border-indigo-500/20 relative overflow-hidden">
+            <Card className="glass-card max-w-2xl mx-auto rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border-indigo-500/20 relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
                <CardHeader className="p-0 mb-8">
                   <CardTitle className="text-2xl font-black text-white italic">PLAN CONFIGURATION</CardTitle>
@@ -194,15 +194,15 @@ export default function PlannerPage() {
             className="space-y-8"
           >
             {/* Strategy Insight */}
-            <Card className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-500/20 rounded-[2rem] p-8 flex items-center gap-6 relative overflow-hidden backdrop-blur-md">
-               <div className="h-16 w-16 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
-                  <BrainCircuit className="h-8 w-8 text-indigo-300" />
+            <Card className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-500/20 rounded-2xl md:rounded-[2rem] p-6 md:p-8 flex items-center md:items-start lg:items-center gap-4 md:gap-6 relative overflow-hidden backdrop-blur-md">
+               <div className="h-12 w-12 md:h-16 md:w-16 rounded-xl md:rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
+                  <BrainCircuit className="h-6 w-6 md:h-8 md:w-8 text-indigo-300" />
                </div>
                <div>
-                  <h3 className="font-bold text-lg text-white">Grace's Strategy: {plan?.title}</h3>
-                  <p className="text-sm text-indigo-200/70 mt-1 max-w-3xl leading-relaxed">
+                  <h3 className="font-bold text-base md:text-lg text-white">Grace's Strategy: {plan?.title}</h3>
+                  <p className="text-xs md:text-sm text-indigo-200/70 mt-1 max-w-3xl leading-relaxed">
                     This plan focuses on bridging your identified gaps while maintaining momentum in your strong subjects. 
-                    I've ordered tasks by mental load—tackling harder topics first.
+                    I've ordered tasks by mental load.
                   </p>
                </div>
             </Card>
@@ -217,14 +217,14 @@ export default function PlannerPage() {
                 >
                    <Card className="glass-card rounded-[2.5rem] overflow-hidden group hover:border-indigo-500/30 transition-all">
                       <div className="flex flex-col md:flex-row">
-                         <div className="md:w-64 bg-white/5 p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5">
+                         <div className="md:w-64 bg-white/5 p-6 md:p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5">
                             <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Day 0{day.day_number}</span>
-                            <h4 className="text-2xl font-black text-white mt-1 uppercase italic tracking-tighter">{day.subject}</h4>
+                            <h4 className="text-xl md:text-2xl font-black text-white mt-1 uppercase italic tracking-tighter">{day.subject}</h4>
                             <div className="mt-4 flex items-center gap-2 text-indigo-400 text-[10px] font-bold uppercase tracking-widest bg-indigo-500/10 w-fit px-3 py-1 rounded-full border border-indigo-500/10">
                                <Target className="h-3 w-3" /> Focus Goal
                             </div>
                          </div>
-                         <div className="flex-1 p-8 grid md:grid-cols-2 gap-8 items-center">
+                         <div className="flex-1 p-6 md:p-8 grid sm:grid-cols-2 gap-6 md:gap-8 items-center">
                             <div className="space-y-4">
                                {day.tasks.map((task, ti) => (
                                  <div key={ti} className="flex items-start gap-3 group/task">
@@ -235,7 +235,7 @@ export default function PlannerPage() {
                                  </div>
                                ))}
                             </div>
-                            <div className="bg-white/[0.02] rounded-3xl p-6 border border-white/5">
+                            <div className="bg-white/[0.02] rounded-2xl md:rounded-3xl p-5 md:p-6 border border-white/5">
                                <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500 block mb-2">END OF DAY GOAL</span>
                                <p className="text-sm text-indigo-200/80 font-semibold italic">&ldquo;{day.goal}&rdquo;</p>
                             </div>

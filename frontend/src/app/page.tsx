@@ -4,10 +4,14 @@ import { motion } from "framer-motion";
 import { Sparkles, Mic, Globe, Zap, Shield, Play, ArrowRight, CheckCircle, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Navbar } from "@/components/Navbar";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white selection:bg-indigo-500/30 overflow-x-hidden">
+      <a href="#main-content" className="sr-only focus:not-sr-only fixed top-4 left-4 z-[100] bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold">
+        Skip to content
+      </a>
       {/* Background Glows */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full" />
@@ -15,30 +19,10 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-50 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto border-b border-white/5 backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <div className="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.4)]">
-            <Zap className="h-6 w-6 text-white" />
-          </div>
-          <span className="text-xl font-black tracking-tighter uppercase">Ace Your Exams</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-           <a href="#features" className="hover:text-white transition-colors">Features</a>
-           <Link href="/how-it-works" className="hover:text-white transition-colors">How it Works</Link>
-           <Link href="/how-it-works#plans" className="hover:text-white transition-colors">Pricing</Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/login">
-            <Button variant="ghost" className="text-neutral-400 hover:text-white">Sign In</Button>
-          </Link>
-          <Link href="/login">
-            <Button className="bg-indigo-600 hover:bg-indigo-700 rounded-xl px-6">Get Started</Button>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 px-6 flex flex-col items-center text-center max-w-5xl mx-auto">
+      <section id="main-content" className="relative pt-20 pb-32 px-6 flex flex-col items-center text-center max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -52,16 +36,16 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40"
+          className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter leading-[1.1] md:leading-[0.9] mb-6 md:mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40"
         >
-          STUDY WITH <br /> <span className="text-indigo-500">EMOTION.</span> PASS WITH <br /> PRIDE.
+          STUDY WITH <br /> <span className="text-indigo-500">EMOTION.</span> <br className="sm:hidden" /> PASS WITH <br /> PRIDE.
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-lg md:text-xl text-neutral-400 max-w-2xl mb-12 leading-relaxed"
+          className="text-base md:text-xl text-neutral-400 max-w-2xl mb-10 md:mb-12 leading-relaxed px-4 md:px-0"
         >
           The first voice-enabled exam prep platform in Nigeria. Don't just read past questions—listen to "Grace", your personal AI tutor who understands your struggle and guides you to success.
         </motion.p>
@@ -70,15 +54,15 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4"
+          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-6 sm:px-0"
         >
-          <Link href="/login">
-            <Button className="h-16 px-10 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-lg font-bold shadow-[0_20px_40px_rgba(79,70,229,0.3)] group transition-all hover:scale-105">
+          <Link href="/login" className="w-full sm:w-auto">
+            <Button className="w-full h-14 md:h-16 px-10 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-lg font-bold shadow-[0_20px_40px_rgba(79,70,229,0.3)] group transition-all hover:scale-105">
               Start Free Practice
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
-          <Button variant="outline" className="h-16 px-10 rounded-2xl border-white/10 hover:bg-white/5 text-lg font-bold backdrop-blur-xl">
+          <Button variant="outline" className="h-14 md:h-16 px-10 rounded-2xl border-white/10 hover:bg-white/5 text-lg font-bold backdrop-blur-xl">
              Watch Demo
              <Play className="ml-2 h-5 w-5 fill-white" />
           </Button>

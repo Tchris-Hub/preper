@@ -54,7 +54,7 @@ export function MotivationalGrace() {
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 100, opacity: 0 }}
-          className="fixed top-20 right-4 md:top-24 md:right-8 z-[60] flex items-center gap-4 bg-indigo-600 p-1 pr-4 rounded-full shadow-2xl border border-white/20 max-w-[calc(100vw-2rem)] md:max-w-md"
+          className="fixed top-24 right-4 md:top-28 md:right-8 z-[60] flex items-center gap-4 bg-indigo-600 p-1 pr-4 rounded-full shadow-2xl border border-white/20 max-w-[calc(100vw-2rem)] md:max-w-md"
         >
           <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-white/20 bg-indigo-500">
              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Grace" alt="Grace" />
