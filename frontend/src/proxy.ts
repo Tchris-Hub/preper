@@ -13,7 +13,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * failures from blocking ALL requests. If Supabase is unreachable, auth state
  * degrades gracefully (user is treated as unauthenticated).
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
