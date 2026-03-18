@@ -4,62 +4,64 @@ import { NextResponse, type NextRequest } from "next/server";
 /**
  * ENTERPRISE MIDDLEWARE
  *
- * This middleware runs on EVERY request to the application.
- * It performs three critical functions:
+ * Runs on every request. Handles:
+ * 1. SESSION REFRESH: Refreshes Supabase auth token on each request.
+ * 2. ROUTE PROTECTION: Redirects unauthenticated users from protected routes.
+ * 3. AUTH REDIRECT: Redirects authenticated users away from login/register.
  *
- * 1. SESSION REFRESH: Automatically refreshes the Supabase auth token
- *    before it expires, ensuring seamless user experience.
- *
- * 2. ROUTE PROTECTION: Redirects unauthenticated users away from
- *    protected routes (dashboard, exams, profile, etc.)
- *
- * 3. AUTH REDIRECT: Redirects already-authenticated users away from
- *    login/register pages to avoid confusion.
+ * NOTE: The auth check is wrapped in try/catch to prevent Edge Runtime network
+ * failures from blocking ALL requests. If Supabase is unreachable, auth state
+ * degrades gracefully (user is treated as unauthenticated).
  */
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // If env vars are missing, skip auth check entirely
+  if (!supabaseUrl || !supabaseKey) {
+    console.error("[Middleware] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set.");
+    return supabaseResponse;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value)
+        );
+        supabaseResponse = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        );
+      },
+    },
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  // IMPORTANT: DO NOT remove this line. It refreshes the auth token.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Refresh session and get user. Wrapped in try/catch to handle Edge Runtime
+  // fetch failures gracefully — avoids 27-second hangs on Windows.
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Edge Runtime on Windows can sometimes fail to reach external hosts.
+    // Treat as unauthenticated and let the page handle auth state client-side.
+    console.warn("[Middleware] Supabase fetch failed — treating as unauthenticated.");
+  }
 
   const { pathname } = request.nextUrl;
 
-  // Define protected routes
   const protectedPaths = ["/dashboard", "/exam", "/profile", "/history", "/notebook", "/subscription"];
   const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
 
-  // Define auth routes (login/register)
   const authPaths = ["/login", "/register"];
   const isAuthRoute = authPaths.some((path) => pathname.startsWith(path));
 
-  // If user is NOT authenticated and trying to access a protected route
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -67,7 +69,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user IS authenticated and trying to access login/register
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
@@ -79,14 +80,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api/ (API routes - these handle their own auth)
-     * - public assets
-     */
     "/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
