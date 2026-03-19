@@ -36,7 +36,7 @@ export async function GET() {
 
   // Analyze with Gemini
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `
       As an expert academic tutor, analyze the following exam history for a student.
       History: ${JSON.stringify(attempts)}

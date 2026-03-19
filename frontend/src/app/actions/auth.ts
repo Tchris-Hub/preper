@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 /**
@@ -13,6 +14,7 @@ import { redirect } from "next/navigation";
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
+  const origin = (await headers()).get("origin");
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -33,6 +35,7 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
+      emailRedirectTo: `${origin}/auth/callback`,
       data: {
         username,
         full_name: `${firstName || ""} ${lastName || ""}`.trim(),
@@ -50,11 +53,27 @@ export async function signUp(formData: FormData) {
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
 
-  const email = formData.get("email") as string;
+  const identifier = formData.get("identifier") as string;
   const password = formData.get("password") as string;
 
-  if (!email || !password) {
-    return { error: "Email and password are required." };
+  if (!identifier || !password) {
+    return { error: "Email/Username and password are required." };
+  }
+
+  let email = identifier;
+
+  // Resolve username to email if identifier is not an email
+  if (!identifier.includes("@")) {
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("username", identifier)
+      .single();
+
+    if (profileError || !profile?.email) {
+      return { error: "No account found with that username." };
+    }
+    email = profile.email;
   }
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -63,10 +82,19 @@ export async function signIn(formData: FormData) {
   });
 
   if (error) {
+    // Check for specific Supabase error: "Email not confirmed"
+    if (error.message.toLowerCase().includes("email not confirmed") || 
+        error.message.toLowerCase().includes("confirm your email")) {
+      return { 
+        error: "Email not confirmed.", 
+        needsConfirmation: true,
+        email 
+      };
+    }
     return { error: error.message };
   }
 
-  redirect("/dashboard");
+  return { success: true };
 }
 
 export async function signOut() {
@@ -81,6 +109,26 @@ export async function getUser() {
     data: { user },
   } = await supabase.auth.getUser();
   return user;
+}
+
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
 }
 
 export async function getProfile() {

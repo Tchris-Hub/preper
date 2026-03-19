@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { question, options, correctAnswer, subject, language } = explainSchema.parse(body);
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
       You are "Grace", a brilliant, warm, and highly encouraging Nigerian study coach. 

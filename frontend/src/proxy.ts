@@ -2,16 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * ENTERPRISE MIDDLEWARE
- *
- * Runs on every request. Handles:
- * 1. SESSION REFRESH: Refreshes Supabase auth token on each request.
- * 2. ROUTE PROTECTION: Redirects unauthenticated users from protected routes.
- * 3. AUTH REDIRECT: Redirects authenticated users away from login/register.
- *
- * NOTE: The auth check is wrapped in try/catch to prevent Edge Runtime network
- * failures from blocking ALL requests. If Supabase is unreachable, auth state
- * degrades gracefully (user is treated as unauthenticated).
+ * NEXT.JS PROXY (MIDDLEWARE)
+ * 
+ * In this project environment, proxy.ts is used instead of middleware.ts.
+ * This handles session refresh and route protection.
  */
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -19,9 +13,7 @@ export async function proxy(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // If env vars are missing, skip auth check entirely
   if (!supabaseUrl || !supabaseKey) {
-    console.error("[Middleware] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY is not set.");
     return supabaseResponse;
   }
 
@@ -42,23 +34,22 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // Refresh session and get user. Wrapped in try/catch to handle Edge Runtime
-  // fetch failures gracefully — avoids 27-second hangs on Windows.
+  // Windows-safe session check (avoids 27s Edge Runtime hangs)
   let user = null;
   try {
     const { data } = await supabase.auth.getUser();
     user = data.user;
   } catch {
-    // Edge Runtime on Windows can sometimes fail to reach external hosts.
-    // Treat as unauthenticated and let the page handle auth state client-side.
-    console.warn("[Middleware] Supabase fetch failed — treating as unauthenticated.");
+    // Graceful fallback for local development network issues
+    console.warn("[Proxy] Supabase check timed out or failed — degrading gracefully.");
   }
 
   const { pathname } = request.nextUrl;
 
+  // Route protection settings
   const protectedPaths = ["/dashboard", "/exam", "/profile", "/history", "/notebook", "/subscription"];
   const isProtected = protectedPaths.some((path) => pathname.startsWith(path));
-
+  
   const authPaths = ["/login", "/register"];
   const isAuthRoute = authPaths.some((path) => pathname.startsWith(path));
 

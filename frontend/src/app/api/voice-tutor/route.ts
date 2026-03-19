@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { message, history } = tutorSchema.parse(body);
 
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" }); // Extremely stable model ID to avoid 404s
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Use 1.5 Flash for speed and stability
 
     const chat = model.startChat({
       history: history || [],
